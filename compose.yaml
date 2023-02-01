@@ -1,0 +1,11 @@
+services:
+  backend:
+    build: ./backend/.
+    ports:
+      - "8001:80"
+  frontend:
+    image: nginx:latest
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+    ports:
+      - "8002:80"

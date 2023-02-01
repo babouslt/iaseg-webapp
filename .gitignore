@@ -1,0 +1,6 @@
+# frontend stuff
+frontend/node_modules/
+frontend/dist/
+
+# trash
+frontendts/
