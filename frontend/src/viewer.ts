@@ -1,6 +1,8 @@
 import { checkNull } from "./utils";
+// import { ClickType, API } from "./api";
 
 export class Viewer {
+  // private api: API;
   private div: HTMLElement;
 
   private imgCanvas : HTMLCanvasElement;
@@ -31,7 +33,10 @@ export class Viewer {
   private _panStartY: number = 0;
   private panning: boolean = false;
 
+  // private clicks: ClickType[] = [];
+
   constructor(divId: string, size: number) {
+    // this.api = new API()
     console.log("consturct")
     this.div = document.getElementById(divId)!;
     checkNull(this.div, "div");
@@ -274,12 +279,21 @@ private zoomInOut = (event: WheelEvent ): void => {
   private _mouseDown = (e: MouseEvent): void => {
     if ((e.button === 1 || e.button === 2)) {  // middle click = pan
       this.mouseDownPan(e);  // pan with middle button or, if outside iis/spix mode, with right button too 
+      // append click to clicks
+      // this.clicks.push([e.offsetX, e.offsetY, false]);
       console.log("woohoo")
     }
+    else if (e.button == 0) {
+      // this.clicks.push([e.offsetX, e.offsetY, true]);
+    }
+    // this.api.sendClicks(this.clicks)
+    // console.log("you should have received the clicks")
+
     // else if ((e.button === 0) || ((e.button === 2) && (2 < this.model.tool))) {  // left click
     //   // this.tools[this.model.tool].mouseDown(e, this);
     
     // }
+
   }
 
 
