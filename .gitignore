@@ -1,11 +1,15 @@
 # some files
 *.pyc
+.vscode/
 
 # envs
 env_*/
 
 # images
 *.jpg
+
+# vol
+vol/
 
 # frontend stuff
 frontend/node_modules/

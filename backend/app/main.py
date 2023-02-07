@@ -1,13 +1,18 @@
-from fastapi import FastAPI, WebSocket
+import logging
+import numpy as np
+logger = logging.getLogger("uvicorn")
+
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.iaseg import IASeg
+from app.serialization import encode_mask, decode_mask
 
+
+# define global variables
 app = FastAPI()
-iaseg = IASeg('app/images/chile.jpg')
-
 origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -16,28 +21,74 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+iaseg = IASeg('app/images/chile.jpg', logger=logger)
+
+connected_websockets = {}
+
+# http endpoints
 @app.get("/")
-def read_root():
+def get_img():
     return FileResponse("app/images/chile.jpg")
 
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
-    while True:
-        data = await websocket.receive_text()
-        await websocket.send_text(f"Message text was: {data}")
-
+# websocket endpoints
 @app.websocket("/ws/clicks")
-async def websocket_endpoint(websocket: WebSocket):
+async def receive_clicks(websocket: WebSocket):
     await websocket.accept()
+    connected_websockets['clicks'] = websocket
     try:
         while True:
             clicks = await websocket.receive_json()
+            logger.info(f"clicks = {clicks}")
             iaseg.set_clicks(clicks)
-    except Exception as e:
-        print(e)
-    finally:
-        websocket.close()
+            mask = iaseg.dummy_predict()
+            await mask_to_frontend(mask)
+    except WebSocketDisconnect:
+        del connected_websockets["clicks"]
+        await websocket.close()
+
+
+@app.websocket("/ws/region")
+async def handle_mask(websocket: WebSocket):
+    await websocket.accept()
+    connected_websockets["region"] = websocket
+    try:
+        while True:
+            region = await websocket.receive_json()
+            logger.info(f"region = {region}")
+    except WebSocketDisconnect:
+        del connected_websockets["region"]
+        await websocket.close()
+
+
+
+@app.websocket("/ws/mask")
+async def handle_mask(websocket: WebSocket):
+    await websocket.accept()
+    connected_websockets["mask"] = websocket
+    try:
+        while True:
+            packed = await websocket.receive_bytes()
+            logger.info("received mask from frontend")
+            mask = decode_mask(packed, iaseg.mask.shape)
+            iaseg.set_mask(mask)
+    except WebSocketDisconnect:
+        del connected_websockets["mask"]
+        await websocket.close()
+
+
+
+async def mask_to_frontend(mask):
+    logger.info("mask_to_frontend")
+    logger.info(connected_websockets)
+    if "mask" in connected_websockets:
+        mask = iaseg.crop_mask(mask)
+        mask_array = np.array(mask).astype(bool)
+        fbin_mask, packed, shape = encode_mask(mask_array)
+        await connected_websockets["mask"].send_bytes(packed)
+        logger.info("sent mask to frontend")
+
+
+
 
 
 

@@ -1,0 +1,4 @@
+/* set image-rendering to pixelated in all canvases */
+canvas {
+  image-rendering: pixelated;
+}
