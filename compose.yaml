@@ -3,6 +3,8 @@ services:
     build: ./backend/.
     ports:
       - "8001:80"
+    volumes:
+      - ./backend/vol:/code/vol
   frontend:
     image: nginx:latest
     volumes:
