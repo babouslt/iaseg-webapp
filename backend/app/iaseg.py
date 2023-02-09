@@ -3,10 +3,11 @@ import numpy as np
 from pathlib import Path
 from PIL import Image
 
-# import sys
-# simpleclick_path = '/home/franchesoni/mine/creations/phd/projects/current/iaseg/SimpleClick'
-# sys.path.append(simpleclick_path)
-# from clean_inference import load_controller
+import sys
+# simpleclick_path = '/code/app/external/SimpleClick'
+simpleclick_path = 'app/external/SimpleClick'
+sys.path.append(simpleclick_path)
+from clean_inference import load_controller
 
 
 def default_read_img_fn(img_path):
@@ -34,19 +35,19 @@ class IASeg:
         self.clicks = []  # clicks are (x, y, is_pos) tuples
         self.dx, self.dy, self.zoom = 0, 0, 1
 
-        # # IIS
-        # self.controller = load_controller()
+        # IIS
+        self.controller = load_controller()
+        self.controller.set_image(np.array(self.Img))  # self.controller.predictor.original_image.shape == [1, 3, H, W]
 
     def set_tool(self, tool):
         self.tool = tool
 
     def set_clicks(self, clicks):
+        assert len(clicks) == len(self.clicks) + 1, "add only one click at a time"
         self.clicks = clicks
-        # assert len(clicks) == len(self.clicks) + 1, "add only one click at a time"
-        # self.clicks = clicks
-        # x, y, is_pos = clicks[-1]
-        # self.controller.add_click(x, y, is_pos)  # this call launches prediction
-        # self.mask = np.array(0 < self.controller.result_mask)
+        x, y, is_pos = clicks[-1]
+        self.controller.add_click(x, y, is_pos)  # this call launches prediction
+        self.mask = Image.fromarray(np.array(0 < self.controller.result_mask))
 
     def crop_mask(self, mask):
         self.logger.info('sizes')

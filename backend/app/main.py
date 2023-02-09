@@ -22,6 +22,10 @@ app.add_middleware(
 )
 
 iaseg = IASeg('app/images/chile.jpg', logger=logger)
+# # test one click, this works
+# clicks = [[482, 152, True]]
+# iaseg.set_clicks(clicks)
+# iaseg.mask.save("vol/mask.png")
 
 connected_websockets = {}
 
@@ -40,8 +44,7 @@ async def receive_clicks(websocket: WebSocket):
             clicks = await websocket.receive_json()
             logger.info(f"clicks = {clicks}")
             iaseg.set_clicks(clicks)
-            mask = iaseg.dummy_predict()
-            await mask_to_frontend(mask)
+            await mask_to_frontend(iaseg.mask)
     except WebSocketDisconnect:
         del connected_websockets["clicks"]
         await websocket.close()
