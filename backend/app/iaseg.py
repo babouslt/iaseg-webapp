@@ -5,7 +5,7 @@ from PIL import Image
 
 import sys
 # simpleclick_path = '/code/app/external/SimpleClick'
-simpleclick_path = 'app/external/SimpleClick'
+simpleclick_path = 'app/SimpleClick'
 sys.path.append(simpleclick_path)
 from clean_inference import load_controller
 
