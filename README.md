@@ -19,6 +19,10 @@ To do this we fix the layout canvas size to be square and multiple of 224 (as in
 we need the frontend viewer to communicate to the backend iaseg and for that the frontend viewer needs to access and open the websockets in itself or via a manager
 
 # to-do
+[x] fix pip versions
+- try tool using frontend of docker compose
+- git clone in docker image pointing to specific commit
+- upload image to dockerhub
 - integrate simpleclick into iaseg
 - restart prediction when new clicks come
 - open an image when requesting root (http)

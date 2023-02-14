@@ -1,25 +1,21 @@
 FROM python:3.10
 WORKDIR /code
 
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir --upgrade fastapi
-RUN pip install --no-cache-dir --upgrade websockets
-RUN pip install --no-cache-dir --upgrade uvicorn
-RUN pip install --no-cache-dir --upgrade numpy
-RUN pip install --no-cache-dir --upgrade torch torchvision
-#  --extra-index-url https://download.pytorch.org/whl/cpu
+# install python packages
 RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
-RUN pip install --no-cache-dir --upgrade opencv-python-headless
-RUN pip install --no-cache-dir --upgrade scikit-image
-RUN pip install --no-cache-dir --upgrade git+https://github.com/rwightman/pytorch-image-models.git
-RUN pip install --no-cache-dir --upgrade mmcv
-RUN pip install --no-cache-dir --upgrade albumentations
-RUN pip install --no-cache-dir --upgrade tensorboard
-RUN pip install --no-cache-dir --upgrade matplotlib
-RUN pip install --no-cache-dir --upgrade PyYAML
-RUN pip install --no-cache-dir --upgrade easydict
-RUN pip install --no-cache-dir --upgrade Cython
+RUN pip install --no-cache-dir --upgrade pip
+COPY ./app/all_requirements.txt /code/app/all_requirements.txt
+RUN pip install --no-cache-dir -r /code/app/all_requirements.txt
+
+# get app code
 COPY ./app /code/app
-# RUN wget https://raw.githubusercontent.com/pytorch/pytorch/master/torch/utils/collect_env.py
-# CMD python collect_env.py > /code/vol/env.txt
+
+# launch app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
+
+# # optionally, save requirements and environment configuration
+# RUN pip freeze > /code/vol/all_requirements.txt
+# RUN wget https://raw.githubusercontent.com/pytorch/pytorch/master/torch/utils/collect_env.py
+# RUN python collect_env.py > /code/vol/env.txt
+# RUN chmod +x /code/app/save_env_and_launch.sh
+# CMD ["sh", "/code/app/save_env_and_launch.sh"]
