@@ -7,7 +7,7 @@ from interactive_demo.controller import InteractiveController
 
 def load_controller():
     torch.backends.cudnn.deterministic = True
-    checkpoint_path = utils.find_checkpoint('app/external/SimpleClick/weights/simpleclick_models/', 'cocolvis_vit_base.pth')
+    checkpoint_path = utils.find_checkpoint('app/SimpleClick/weights/simpleclick_models/', 'cocolvis_vit_base.pth')
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     model = utils.load_is_model(checkpoint_path, device, False, cpu_dist_maps=True)
     controller = InteractiveController(model, device,

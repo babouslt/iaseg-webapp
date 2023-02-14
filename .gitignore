@@ -6,7 +6,6 @@
 env_*/
 
 # images
-*.jpg
 *.png
 
 # vol
