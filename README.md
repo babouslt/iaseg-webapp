@@ -1,3 +1,15 @@
+# install
+after cloning this repo:
+
+- we need to manually download the cocolvis_vit_base.pth and set them at `backend/app/SimpleClick/weights/simpleclick_models/cocolvis_vit_base.pth`
+from :
+https://drive.google.com/drive/folders/1qpK0gtAPkVMF7VC42UA9XF4xMWr5KJmL?usp=sharing
+
+- then `cd frontend` and run `npm install` and `npm run build`
+
+- cd back to the root folder and run `docker compose up`
+
+
 # dev
 you can try the frontend with `npm run dev` but in order to use compose you should run `npm run build` first. Basically we develop the frontend using vite and then vite creates the frontend app in the `frontend/dist` folder, which is then served by nginx (this might change in the future). 
 Use `docker compose up` to run the app. The backend is served by uvicorn and the frontend by nginx. The frontend is served at `localhost:8082` and the backend at `localhost:8001`. 
@@ -21,10 +33,10 @@ we need the frontend viewer to communicate to the backend iaseg and for that the
 # to-do
 [x] fix pip versions
 [x] try tool using frontend of docker compose
-- git clone in docker image pointing to specific commit
-- upload image to dockerhub
-- integrate simpleclick into iaseg
-- restart prediction when new clicks come
+[x] git clone in docker image pointing to specific commit <- we just copied pasted the code, it's better (easier, more reliable)
+[] upload image to dockerhub ?
+[x] integrate simpleclick into iaseg
+- restart prediction when new clicks come 
 - open an image when requesting root (http)
 - send clicks to backend
   - for simplicity we always send all the clicks, although a more efficient implementation would send only the last click
@@ -33,8 +45,8 @@ we need the frontend viewer to communicate to the backend iaseg and for that the
 - implement reset when changing images
 - run `npm run build` when running `docker-compose up`
 
-
 - add vertical and horizontal lines in cursor
+- add zoom in again
 - set origins
 - pixelate when zooming in
 - think about the need of a "real mask" channel that allows to draw scribbles
