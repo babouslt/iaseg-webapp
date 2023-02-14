@@ -20,7 +20,7 @@ we need the frontend viewer to communicate to the backend iaseg and for that the
 
 # to-do
 [x] fix pip versions
-- try tool using frontend of docker compose
+[x] try tool using frontend of docker compose
 - git clone in docker image pointing to specific commit
 - upload image to dockerhub
 - integrate simpleclick into iaseg

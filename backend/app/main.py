@@ -21,7 +21,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-iaseg = IASeg('app/images/chile.jpg', logger=logger)
+img_path = 'app/images/chile.jpg'
+iaseg = IASeg(img_path, logger=logger)
 # # test one click, this works
 # clicks = [[482, 152, True]]
 # iaseg.set_clicks(clicks)
@@ -31,8 +32,11 @@ connected_websockets = {}
 
 # http endpoints
 @app.get("/")
-def get_img():
-    return FileResponse("app/images/chile.jpg")
+def get_img(timestamp: int = None):
+    if timestamp is not None:
+        logger.info("reset")
+        iaseg.__init__(img_path, logger=logger)  # reset IASeg
+        return FileResponse(img_path)
 
 # websocket endpoints
 @app.websocket("/ws/clicks")
