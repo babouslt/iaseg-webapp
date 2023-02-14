@@ -1,5 +1,0 @@
-fastapi
-websockets
-uvicorn
-numpy
-Pillow
