@@ -1,7 +1,8 @@
 import { Viewer } from "./viewer";  // only here for typing
+import { IPaddress } from "./main"
 export type ClickType = [number, number, boolean]
 
-const IPaddress = "138.231.63.90"
+
 
 export class API {
   private wsRegion: WebSocket;
