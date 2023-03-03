@@ -1,6 +1,8 @@
 import { Viewer } from "./viewer";  // only here for typing
 export type ClickType = [number, number, boolean]
 
+const IPaddress = "138.231.63.90"
+
 export class API {
   private wsRegion: WebSocket;
   private wsClicks: WebSocket;
@@ -15,10 +17,11 @@ export class API {
   // manaoges the websockets and requests to the backend
   constructor(viewer: Viewer) {
     this.viewer = viewer;  // tight coupling
-    this.wsRegion = new WebSocket("ws://localhost:8002/ws/region");
-    this.wsClicks = new WebSocket("ws://localhost:8002/ws/clicks");
+    // add websocket to IPaddress
+    this.wsRegion = new WebSocket(`ws://${IPaddress}:8002/ws/region`);
+    this.wsClicks = new WebSocket(`ws://${IPaddress}:8002/ws/clicks`);
 
-    this.wsMask = new WebSocket("ws://localhost:8002/ws/mask");
+    this.wsMask = new WebSocket(`ws://${IPaddress}:8002/ws/mask`);
     this.wsMask.binaryType = "arraybuffer";
     this.receivedMask = new Uint8ClampedArray(0);
     this.wsMask.onmessage = this.receiveMask.bind(this);
