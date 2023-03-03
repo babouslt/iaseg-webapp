@@ -9,6 +9,11 @@ RUN pip install --no-cache-dir -r /code/app/all_requirements.txt
 
 # get app code
 COPY ./app /code/app
+# get frontend code
+COPY ./dist /code/frontend
+
+EXPOSE 80
+VOLUME /code/vol
 
 # launch app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
