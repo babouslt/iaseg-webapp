@@ -2,7 +2,7 @@ services:
   backend:
     build: ./backend/.
     ports:
-      - "8001:80"
+      - "8002:80"
     volumes:
       - ./backend/vol:/code/vol
   frontend:
@@ -10,4 +10,4 @@ services:
     volumes:
       - ./frontend/dist:/usr/share/nginx/html
     ports:
-      - "8002:80"
+      - "8000:80"
