@@ -3,7 +3,8 @@ import numpy as np
 logger = logging.getLogger("uvicorn")
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.iaseg import IASeg
@@ -21,6 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 img_path = 'app/images/chile.jpg'
 iaseg = IASeg(img_path, logger=logger)
 # # test one click, this works
@@ -31,15 +33,24 @@ iaseg = IASeg(img_path, logger=logger)
 connected_websockets = {}
 
 # http endpoints
-@app.get("/api/")
+app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
+app.mount("/assets", StaticFiles(directory="frontend/assets"), name="assets")
+
+@app.get("/", response_class=HTMLResponse)
+async def root():  # serve frontend
+    return open("frontend/index.html").read()
+
+@app.get("/img")
 def get_img(timestamp: int = None):
     if timestamp is not None:
         logger.info("reset")
         iaseg.__init__(img_path, logger=logger)  # reset IASeg
         return FileResponse(img_path)
 
+
+
 # websocket endpoints
-@app.websocket("/api/ws/clicks")
+@app.websocket("/ws/clicks")
 async def receive_clicks(websocket: WebSocket):
     await websocket.accept()
     connected_websockets['clicks'] = websocket
@@ -54,7 +65,7 @@ async def receive_clicks(websocket: WebSocket):
         await websocket.close()
 
 
-@app.websocket("/api/ws/region")
+@app.websocket("/ws/region")
 async def handle_mask(websocket: WebSocket):
     await websocket.accept()
     connected_websockets["region"] = websocket
@@ -68,7 +79,7 @@ async def handle_mask(websocket: WebSocket):
 
 
 
-@app.websocket("/api/ws/mask")
+@app.websocket("/ws/mask")
 async def handle_mask(websocket: WebSocket):
     await websocket.accept()
     connected_websockets["mask"] = websocket
