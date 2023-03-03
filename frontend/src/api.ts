@@ -15,10 +15,10 @@ export class API {
   // manaoges the websockets and requests to the backend
   constructor(viewer: Viewer) {
     this.viewer = viewer;  // tight coupling
-    this.wsRegion = new WebSocket("ws://localhost:8001/ws/region");
-    this.wsClicks = new WebSocket("ws://localhost:8001/ws/clicks");
+    this.wsRegion = new WebSocket("ws://localhost:8002/ws/region");
+    this.wsClicks = new WebSocket("ws://localhost:8002/ws/clicks");
 
-    this.wsMask = new WebSocket("ws://localhost:8001/ws/mask");
+    this.wsMask = new WebSocket("ws://localhost:8002/ws/mask");
     this.wsMask.binaryType = "arraybuffer";
     this.receivedMask = new Uint8ClampedArray(0);
     this.wsMask.onmessage = this.receiveMask.bind(this);

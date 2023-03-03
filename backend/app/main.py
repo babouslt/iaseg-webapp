@@ -31,7 +31,7 @@ iaseg = IASeg(img_path, logger=logger)
 connected_websockets = {}
 
 # http endpoints
-@app.get("/")
+@app.get("/api/")
 def get_img(timestamp: int = None):
     if timestamp is not None:
         logger.info("reset")
@@ -39,7 +39,7 @@ def get_img(timestamp: int = None):
         return FileResponse(img_path)
 
 # websocket endpoints
-@app.websocket("/ws/clicks")
+@app.websocket("/api/ws/clicks")
 async def receive_clicks(websocket: WebSocket):
     await websocket.accept()
     connected_websockets['clicks'] = websocket
@@ -54,7 +54,7 @@ async def receive_clicks(websocket: WebSocket):
         await websocket.close()
 
 
-@app.websocket("/ws/region")
+@app.websocket("/api/ws/region")
 async def handle_mask(websocket: WebSocket):
     await websocket.accept()
     connected_websockets["region"] = websocket
@@ -68,7 +68,7 @@ async def handle_mask(websocket: WebSocket):
 
 
 
-@app.websocket("/ws/mask")
+@app.websocket("/api/ws/mask")
 async def handle_mask(websocket: WebSocket):
     await websocket.accept()
     connected_websockets["mask"] = websocket
