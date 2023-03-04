@@ -19,10 +19,10 @@ export class API {
   constructor(viewer: Viewer) {
     this.viewer = viewer;  // tight coupling
     // add websocket to IPaddress
-    this.wsRegion = new WebSocket(`ws://${IPaddress}:8002/ws/region`);
-    this.wsClicks = new WebSocket(`ws://${IPaddress}:8002/ws/clicks`);
+    this.wsRegion = new WebSocket(`ws://${IPaddress}:${port}/ws/region`);
+    this.wsClicks = new WebSocket(`ws://${IPaddress}:${port}/ws/clicks`);
 
-    this.wsMask = new WebSocket(`ws://${IPaddress}:8002/ws/mask`);
+    this.wsMask = new WebSocket(`ws://${IPaddress}:${port}/ws/mask`);
     this.wsMask.binaryType = "arraybuffer";
     this.receivedMask = new Uint8ClampedArray(0);
     this.wsMask.onmessage = this.receiveMask.bind(this);
