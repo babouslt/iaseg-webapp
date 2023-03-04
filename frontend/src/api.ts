@@ -1,5 +1,5 @@
 import { Viewer } from "./viewer";  // only here for typing
-import { IPaddress } from "./main"
+import { IPaddress, port } from "./main"
 export type ClickType = [number, number, boolean]
 
 
