@@ -1,7 +1,8 @@
 import './style.css';
 import { Viewer } from './viewer';
 
-export const IPaddress = "localhost"
+export const IPaddress = "138.231.63.90"
+
 
 let img: HTMLImageElement = new Image();
 const timestamp = new Date().getTime();  // hack to always reload
