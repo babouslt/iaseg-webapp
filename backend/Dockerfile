@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
 RUN pip install --no-cache-dir --upgrade pip
 COPY ./app/all_requirements.txt /code/app/all_requirements.txt
 RUN pip install --no-cache-dir -r /code/app/all_requirements.txt
+# RUN pip install python-multipart==0.0.6
 
 # get app code
 COPY ./app /code/app
@@ -13,7 +14,7 @@ COPY ./app /code/app
 COPY ./dist /code/frontend
 
 EXPOSE 80
-VOLUME /code/vol
+VOLUME ["/code/vol/out", "/code/vol/images"]
 
 # launch app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]

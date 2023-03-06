@@ -15,7 +15,7 @@ def load_controller():
                                                 update_image_callback=None)
     def update_image_callback(reset_canvas=True):
       img = controller.get_visualization(0.5, 5)
-      Image.fromarray(img).save('vol/out.png')
+      Image.fromarray(img).save('/code/vol/out.png')
 
     controller.update_image_callback = update_image_callback
     return controller
