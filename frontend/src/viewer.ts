@@ -167,7 +167,6 @@ export class Viewer {
 
   
     public handleImage(img: HTMLImageElement) {
-      console.log('handle image')
       this.imgContext.clearRect(0, 0, this.imgCanvas.width, this.imgCanvas.height);
       this.putImage(img)
       this.imgHeight = img.height;

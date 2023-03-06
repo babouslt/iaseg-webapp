@@ -1,11 +1,8 @@
 import logging
-from typing import Any
-from PIL import Image
-import io
 import numpy as np
 logger = logging.getLogger("uvicorn")
 
-from fastapi import FastAPI, File, WebSocket, WebSocketDisconnect, UploadFile
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,16 +23,11 @@ app.add_middleware(
 )
 
 
-img_path = 'app/images/chile.jpg'
-iaseg = IASeg(img_path, logger=logger)
-# # test one click, this works
-# clicks = [[482, 152, True]]
-# iaseg.set_clicks(clicks)
-# iaseg.mask.save("vol/mask.png")
-
+iaseg = IASeg(logger=logger)
 connected_websockets = {}
 
 # http endpoints
+# # frontend
 app.mount("/frontend", StaticFiles(directory="frontend"), name="frontend")
 app.mount("/assets", StaticFiles(directory="frontend/assets"), name="assets")
 
@@ -43,12 +35,20 @@ app.mount("/assets", StaticFiles(directory="frontend/assets"), name="assets")
 async def root():  # serve frontend
     return open("frontend/index.html").read()
 
+# # load image
 @app.get("/img")
 def get_img(timestamp: int = None):
     if timestamp is not None:
         logger.info("reset")
-        iaseg.__init__(img_path, logger=logger)  # reset IASeg
+        iaseg.clear()
+        img_path = iaseg.reset(0)
         return FileResponse(img_path)
+
+@app.get("/files")
+def get_files():
+    logger.info("get files")
+    # return the list of image paths
+    return iaseg.state.files
 
 
 # websocket endpoints
@@ -60,8 +60,8 @@ async def receive_clicks(websocket: WebSocket):
         while True:
             clicks = await websocket.receive_json()
             logger.info(f"clicks = {clicks}")
-            iaseg.set_clicks(clicks)
-            await mask_to_frontend(iaseg.mask)
+            iaseg.set_clicks_and_infer(clicks)
+            await mask_to_frontend(iaseg.state.pilMask)
     except WebSocketDisconnect:
         del connected_websockets["clicks"]
         await websocket.close()
@@ -96,12 +96,11 @@ async def handle_mask(websocket: WebSocket):
         await websocket.close()
 
 
-
 async def mask_to_frontend(mask):
     logger.info("mask_to_frontend")
     logger.info(connected_websockets)
     if "mask" in connected_websockets:
-        mask = iaseg.crop_mask(mask)
+        # mask = iaseg.crop_mask(mask)
         mask_array = np.array(mask).astype(bool)
         fbin_mask, packed, shape = encode_mask(mask_array)
         await connected_websockets["mask"].send_bytes(packed)

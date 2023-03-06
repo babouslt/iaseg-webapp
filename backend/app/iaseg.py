@@ -1,3 +1,4 @@
+import os
 from math import floor
 import numpy as np
 from pathlib import Path
@@ -9,6 +10,34 @@ simpleclick_path = 'app/SimpleClick'
 sys.path.append(simpleclick_path)
 from clean_inference import load_controller
 
+"""Notes:
+maskPath is always imgPath + _mask.png
+"""
+
+class IAsegState:
+    def __init__(self):
+        self.reset()
+
+    def reset(self, imgNumber=None):
+        # image and mask
+        self.pilImg : Image = None
+        self.pilMask : Image = None
+        self.imgPath : Path = None
+        self.maskPath : Path = None
+        # algorithms
+        self.tool : int = 0
+        self.clicks = []  # clicks are (x, y, is_pos) tuples
+        # display
+        self.dx, self.dy, self.zoom = 0, 0, 1
+        # filesystem
+        self.imgNumber : int = imgNumber
+        self.files = []
+
+
+def find_files(path: str = "/vol/images", allowed_extensions : list[str] =['.jpg', '.jpeg']):
+    # finds all files with allowed extensions in a dir recursively
+    return sorted([str(file) for file in Path(path).glob('**/*') if file.is_file() and file.suffix in allowed_extensions])
+
 
 def default_read_img_fn(img_path):
     # reads image using PIL.Image.open into PIL.Image obj
@@ -16,70 +45,73 @@ def default_read_img_fn(img_path):
 
 
 class IASeg:
-    def __init__(self, img_path, logger, read_img_fn=default_read_img_fn):
+    def __init__(self, logger, read_img_fn=default_read_img_fn):
         self.logger = logger
-        # get image and mask
-        # binary mask is in the same image path but ends with _mask.pbm
-        img_Path = Path(img_path)
-        mask_path = img_Path.with_stem(img_Path.name + "_mask").with_suffix(".pbm")
-        self.set_PIL_Image_and_reset(read_img_fn(img_path))
-        if mask_path and mask_path.exists():
-            self.mask = Image.open(mask_path)
+        self.read_img_fn = read_img_fn
+        self.clear()
 
-    def set_PIL_Image_and_reset(self, Img):
-        self._set_PIL_Image(Img)
-        self._reset()
+    def clear(self):
+        # initialize
+        self.state = IAsegState()  # reset state
+        if hasattr(self, "controller"):
+            del self.controller  # delete controller to free memory
 
-    
-    def _reset(self):
-        assert hasattr(self, 'Img'), "call set_PIL_Image first"
-        # get tool
-        self.tool = 0
-        # init clicks
-        self.clicks = []  # clicks are (x, y, is_pos) tuples
-        self.dx, self.dy, self.zoom = 0, 0, 1
+    def reset(self, imgNumber):
+        self.state.files = find_files()  # this might change from run to run
+        # load image
+        self.state.imgNumber = imgNumber
+        img_path = self.state.files[self.state.imgNumber]
+        self.state.pilImg, self.state.pilMask, self.state.H, self.state.W = IASeg.load_image_and_mask(img_path)
 
         # IIS
         self.controller = load_controller()
-        self.controller.set_image(np.array(self.Img))  # self.controller.predictor.original_image.shape == [1, 3, H, W]
+        self.controller.set_image(np.array(self.state.pilImg))  # self.controller.predictor.original_image.shape == [1, 3, H, W]
+        return img_path
 
+    @staticmethod
+    def load_image_and_mask(img_path):
+        imgPath = Path(img_path)
+        maskPath = imgPath.with_stem(imgPath.name + "_mask").with_suffix(".png")
 
-    def _set_PIL_Image(self, Img):
-        self.Img = Img
-        self.H, self.W = self.Img.size
-        self.mask_path = None
-        self.mask = Image.fromarray(np.zeros((self.W, self.H), dtype=bool))
-        
+        pilImg = Image.open(img_path)
+        W, H = pilImg.size
+        mask_path = None
+ 
+        if mask_path and mask_path.exists():
+            pilMask = Image.open(mask_path)
+        else:
+            pilMask = Image.fromarray(np.zeros((H, W), dtype=bool))
+        return pilImg, pilMask, H, W
 
-    def set_clicks(self, clicks):
-        assert len(clicks) == len(self.clicks) + 1, "add only one click at a time"
-        self.clicks = clicks
+    def set_clicks_and_infer(self, clicks):
+        assert len(clicks) == len(self.state.clicks) + 1, "add only one click at a time"
+        self.state.clicks = clicks
         x, y, is_pos = clicks[-1]
         self.controller.add_click(x, y, is_pos)  # this call launches prediction
-        self.mask = Image.fromarray(np.array(0 < self.controller.result_mask))
+        self.state.pilMask = Image.fromarray(np.array(0 < self.controller.result_mask))  # the same as proposal
 
-    def crop_mask(self, mask):
-        self.logger.info('sizes')
-        self.logger.info(mask.size)
-        mask_crop = mask.crop(
-          (
-            min(0, floor(-self.dy / self.zoom)),
-            min(0, floor(-self.dx / self.zoom)),
-            max(self.H, floor((self.H - self.dy) / self.zoom)),
-            max(self.W, floor((self.W - self.dx) / self.zoom)),
-          )
-        )
-        self.logger.info(mask_crop.size)
-        return mask_crop
+    # def crop_mask(self, mask):
+    #     self.logger.info('sizes')
+    #     self.logger.info(mask.size)
+    #     mask_crop = mask.crop(
+    #       (
+    #         min(0, floor(-self.dy / self.zoom)),
+    #         min(0, floor(-self.dx / self.zoom)),
+    #         max(self.H, floor((self.H - self.dy) / self.zoom)),
+    #         max(self.W, floor((self.W - self.dx) / self.zoom)),
+    #       )
+    #     )
+    #     self.logger.info(mask_crop.size)
+    #     return mask_crop
 
-    def dummy_predict(self):
-        # dummy prediction, just add some mask around the click position
-        mask = np.array(self.mask)
-        for xa, ya, is_pos in self.clicks:
-            x, y = ya, xa
-            mask[x - 10 : x + 10, y - 10 : y + 10] = is_pos
-        self.mask = Image.fromarray(mask)
-        self.mask.save("/code/vol/mask.png")
-        self.crop_mask(self.mask).save("/code/vol/mask_crop.png")
-        return self.mask
+    # def dummy_predict(self):
+    #     # dummy prediction, just add some mask around the click position
+    #     mask = np.array(self.mask)
+    #     for xa, ya, is_pos in self.clicks:
+    #         x, y = ya, xa
+    #         mask[x - 10 : x + 10, y - 10 : y + 10] = is_pos
+    #     self.mask = Image.fromarray(mask)
+    #     self.mask.save("/code/vol/mask.png")
+    #     self.crop_mask(self.mask).save("/code/vol/mask_crop.png")
+    #     return self.mask
 
