@@ -14,7 +14,7 @@ COPY ./app /code/app
 COPY ./dist /code/frontend
 
 EXPOSE 80
-VOLUME ["/code/vol/out", "/code/vol/images"]
+VOLUME ["/vol/out", "/vol/images"]
 
 # launch app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "80"]
