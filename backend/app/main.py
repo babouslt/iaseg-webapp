@@ -111,12 +111,3 @@ async def mask_to_frontend(mask):
 
 
 
-
-# @app.post("/upload")
-# async def post_img(file: UploadFile):
-#     logger.info("new image")
-#     contents = await file.read()
-#     Img = Image.open(io.BytesIO(contents))
-#     iaseg.set_PIL_Image_and_reset(Img)
-#     return {"status": "ok"}
-

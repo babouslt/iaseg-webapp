@@ -23,39 +23,3 @@ img.addEventListener("load", () => {
 }
 );
 
-
-
-// const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-// fileInput.addEventListener('change', async () => {
-//   const files = fileInput.files
-//   if (files && files.length > 0) {
-//   const file = files[0];
-//   const reader = new FileReader();
-//   reader.readAsArrayBuffer(file);
-
-//   reader.onload = async () => {
-//     const imgArrayBuffer = reader.result as ArrayBuffer;
-//     console.log(imgArrayBuffer)
-//     console.log("uploading image")
-
-//     const response = await fetch(`http://${IPaddress}:${port}/upload`, {
-//       method: 'POST',
-
-//       headers: {
-//       //   'Content-Type': 'image/jpeg'
-//       //   'Content-Type': 'application/octet-stream'
-//       },
-//       body: imgArrayBuffer
-//     });
-//     if (response.ok) {
-//       const imgBlob = new Blob([imgArrayBuffer], {type: 'image/jpeg'});
-//       img.src = URL.createObjectURL(imgBlob);  // resets and handles image
-//     }
-//     else {
-//       console.log("error when uploading image")
-//     }
-//   }
-//   };
-// }
-// );
-
