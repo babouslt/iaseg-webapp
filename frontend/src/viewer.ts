@@ -92,7 +92,21 @@ export class Viewer {
     });
     }
 
-    putImage(img: HTMLImageElement) {
+  reset() {
+    this.zoom = 1;
+    this.dx = 0;
+    this.dy = 0;
+    this.alpha = 0.5;
+    this.clicks = [];
+    this.imgHeight = 0;
+    this.imgWidth = 0;
+    this.clearDataCanvases();
+    this.redraw();
+  }
+  
+    
+
+  putImage(img: HTMLImageElement) {
       this.clearDataCanvases();
       this.resizeDataCanvases(img.width, img.height);
       this.imgContext.drawImage(img, 0, 0); 

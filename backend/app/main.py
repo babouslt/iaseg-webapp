@@ -1,8 +1,11 @@
 import logging
+from typing import Any
+from PIL import Image
+import io
 import numpy as np
 logger = logging.getLogger("uvicorn")
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, File, WebSocket, WebSocketDisconnect, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -46,7 +49,6 @@ def get_img(timestamp: int = None):
         logger.info("reset")
         iaseg.__init__(img_path, logger=logger)  # reset IASeg
         return FileResponse(img_path)
-
 
 
 # websocket endpoints
@@ -109,4 +111,12 @@ async def mask_to_frontend(mask):
 
 
 
+
+# @app.post("/upload")
+# async def post_img(file: UploadFile):
+#     logger.info("new image")
+#     contents = await file.read()
+#     Img = Image.open(io.BytesIO(contents))
+#     iaseg.set_PIL_Image_and_reset(Img)
+#     return {"status": "ok"}
 
