@@ -22,13 +22,17 @@ class IASeg:
         # binary mask is in the same image path but ends with _mask.pbm
         img_Path = Path(img_path)
         mask_path = img_Path.with_stem(img_Path.name + "_mask").with_suffix(".pbm")
-        self.Img = read_img_fn(img_path)  # should read into numpy array
-        self.H, self.W = self.Img.size
-        if mask_path.exists():
+        self.set_PIL_Image_and_reset(read_img_fn(img_path))
+        if mask_path and mask_path.exists():
             self.mask = Image.open(mask_path)
-        else:
-            self.mask = Image.fromarray(np.zeros((self.W, self.H), dtype=bool))
 
+    def set_PIL_Image_and_reset(self, Img):
+        self._set_PIL_Image(Img)
+        self._reset()
+
+    
+    def _reset(self):
+        assert hasattr(self, 'Img'), "call set_PIL_Image first"
         # get tool
         self.tool = 0
         # init clicks
@@ -39,8 +43,13 @@ class IASeg:
         self.controller = load_controller()
         self.controller.set_image(np.array(self.Img))  # self.controller.predictor.original_image.shape == [1, 3, H, W]
 
-    def set_tool(self, tool):
-        self.tool = tool
+
+    def _set_PIL_Image(self, Img):
+        self.Img = Img
+        self.H, self.W = self.Img.size
+        self.mask_path = None
+        self.mask = Image.fromarray(np.zeros((self.W, self.H), dtype=bool))
+        
 
     def set_clicks(self, clicks):
         assert len(clicks) == len(self.clicks) + 1, "add only one click at a time"
