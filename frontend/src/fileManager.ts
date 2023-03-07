@@ -1,14 +1,17 @@
 import { IPaddress, port } from "./main";
 
 export class FileManager {
+  img : HTMLImageElement;
   imgNumber: number = 0;
+  private newImgNumber: number = 0;
   private imgNumberDiv: HTMLDivElement;
   private files: string[] = [];
   private filesDiv: HTMLDivElement;
   private prevButton: HTMLButtonElement;
   private nextButton: HTMLButtonElement;
 
-  constructor() {
+  constructor(img : HTMLImageElement) {
+    this.img = img;
     this.imgNumberDiv = document.getElementById("imgNumber") as HTMLDivElement;
     this.filesDiv = document.getElementById("fileList") as HTMLDivElement;
     this.prevButton = document.getElementById("prev") as HTMLButtonElement;
@@ -27,33 +30,42 @@ export class FileManager {
     })
     // wait for the last promise to finish before exiting constructor
       
-
-
     // add event listeners to buttons
     this.prevButton.addEventListener("click", () => this.prev());
     this.nextButton.addEventListener("click", () => this.next());
+    this.img.addEventListener("load", () => {
+      // if success
+      this.imgNumber = this.newImgNumber;
+      this.imgNumberDiv.innerHTML = `index ${this.imgNumber}: ${this.files[this.imgNumber]}`;
+    })
+    this.triggerUpdateImage(this.imgNumber);
   }
+
+
 
   private prev() {
     console.log('prev')
     if (this.imgNumber > 0) {
-      this.imgNumber -= 1;
-      this.triggerUpdateImage();
+      this.triggerUpdateImage(this.imgNumber - 1);
     }
   }
 
   private next() {
     console.log('next')
     if (this.imgNumber < this.files.length - 1) {
-      this.imgNumber += 1;
-      this.triggerUpdateImage();
+      this.triggerUpdateImage(this.imgNumber + 1);
     }
   }
 
-  private triggerUpdateImage() {
-    this.imgNumberDiv.innerHTML = `index ${this.imgNumber}: ${this.files[this.imgNumber]}`;
-    const event = new Event("updateImage");
-    document.dispatchEvent(event);
+  private triggerUpdateImage(newImgNumber: number) {
+    this.newImgNumber = newImgNumber;
+    this.setImgSrc(this.img, newImgNumber);
+
+  }
+
+  setImgSrc(img: HTMLImageElement, imgNumber: number) {
+    const timestamp = new Date().getTime();  // hack to always reload
+    img.src = `http://${IPaddress}:${port}/img/${imgNumber}?timestamp=${timestamp}`;
   }
 }
   
