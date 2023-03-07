@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import io
 logger = logging.getLogger("uvicorn")
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -97,14 +98,14 @@ async def handle_mask(websocket: WebSocket):
         await websocket.close()
 
 
-async def mask_to_frontend(mask):
+async def mask_to_frontend(pilMask):
     logger.info("mask_to_frontend")
     logger.info(connected_websockets)
     if "mask" in connected_websockets:
-        # mask = iaseg.crop_mask(mask)
-        mask_array = np.array(mask).astype(bool)
-        fbin_mask, packed, shape = encode_mask(mask_array)
-        await connected_websockets["mask"].send_bytes(packed)
+        buffer = io.BytesIO()
+        pilMask.save(buffer, format="PNG")
+        png_data = buffer.getvalue()
+        await connected_websockets["mask"].send_bytes(png_data)
         logger.info("sent mask to frontend")
 
 

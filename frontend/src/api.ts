@@ -1,3 +1,4 @@
+import UPNG from "upng-js";
 import { Viewer } from "./viewer";  // only here for typing
 import { IPaddress, port } from "./main"
 export type ClickType = [number, number, boolean]
@@ -39,11 +40,15 @@ export class API {
     this.wsRegion.send(JSON.stringify({"dx":dx, "dy":dy, "zoom":zoom}));
   }
 
-
   receiveMask(event: MessageEvent) {
     console.log("receiving mask")
-    this.receivedMask = this.decodeMask(event)
-    const maskData = new ImageData(this.receivedMask, Math.floor(this.viewer.imgWidth), Math.floor(this.viewer.imgHeight));
+    // what is received are the bytes of a .png file
+    const arrayBuffer = event.data;
+    const img = UPNG.decode(arrayBuffer);
+    const rgba8 = new Uint8ClampedArray(UPNG.toRGBA8(img)[0]);
+
+    const maskData = new ImageData(rgba8, Math.floor(this.viewer.imgWidth), Math.floor(this.viewer.imgHeight));
+    console.log(event)
     // put image in canvas, create new canvas
     const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
     maskCanvas.width = Math.floor(this.viewer.imgWidth);
@@ -53,42 +58,5 @@ export class API {
     this.viewer.annContext.putImageData(maskData, 0, 0);
     this.viewer.redraw()
   }
-
-
-  private decodeMask(event: MessageEvent): Uint8ClampedArray {
-    const height = Math.floor(this.viewer.imgHeight);
-    const width = Math.floor(this.viewer.imgWidth);
-    console.log("decoding mask")
-    const dataView = new DataView(event.data);
-    const flattenedBinaryImage = new Uint8Array(height * width);
-    const rgbaImage = new Uint8ClampedArray(height * width * 4);
-
-    let binaryIndex = 0;
-    let rgbaIndex = 0;
-
-    // Loop through each byte in the binary data
-    for (let i = 0; i < event.data.byteLength; i++) {
-        const byte = dataView.getUint8(i);
-        // Loop through each bit in the current byte
-        for (let j = 0; j < 8; j++) {
-            // Set the corresponding pixel in the binary image based on the value of the bit
-            if (binaryIndex >= width * height) {
-                break;
-            }
-            flattenedBinaryImage[binaryIndex] = (byte >> (7-j)) & 1;
-            rgbaImage[rgbaIndex + 0] = 255;
-            rgbaImage[rgbaIndex + 1] = (1 - flattenedBinaryImage[binaryIndex]) * 255;
-            rgbaImage[rgbaIndex + 2] = 255;
-            rgbaImage[rgbaIndex + 3] = flattenedBinaryImage[binaryIndex] * 255;
-
-            binaryIndex++;
-            rgbaIndex += 4;
-        }
-
-    }
-    console.log(flattenedBinaryImage)
-    return rgbaImage;
-  }
-
 
 }
