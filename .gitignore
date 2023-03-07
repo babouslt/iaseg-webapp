@@ -9,8 +9,8 @@ env_*/
 *.png
 
 # vol
-vol/out/
-vol/images/
+# vol/out/
+# vol/images/
 
 # frontend stuff
 frontend/node_modules/
