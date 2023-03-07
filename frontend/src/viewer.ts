@@ -104,14 +104,8 @@ export class Viewer {
     this.redraw();
   }
   
-    
 
-  putImage(img: HTMLImageElement) {
-      this.clearDataCanvases();
-      this.resizeDataCanvases(img.width, img.height);
-      this.imgContext.drawImage(img, 0, 0); 
-      this.redraw()
-    }
+    
 
   redraw(): void {
     // at some point should consider: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas
@@ -166,12 +160,33 @@ export class Viewer {
   }
 
   
-    public handleImage(img: HTMLImageElement) {
+  public handleImage(img: HTMLImageElement) {
       this.imgContext.clearRect(0, 0, this.imgCanvas.width, this.imgCanvas.height);
-      this.putImage(img)
       this.imgHeight = img.height;
       this.imgWidth = img.width;
+      this.putImage(img)
+      this.resetMaskCanvas()
+      console.log('viewer clicks' + this.clicks)
    }
+
+  private resetMaskCanvas() {
+    const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
+    maskCanvas.width = Math.floor(this.imgWidth);
+    maskCanvas.height = Math.floor(this.imgHeight);
+    const ctx = maskCanvas.getContext("2d")!;
+    ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+  }
+
+
+
+  private putImage(img: HTMLImageElement) {
+      this.clearDataCanvases();
+      this.resizeDataCanvases(img.width, img.height);
+      this.imgContext.drawImage(img, 0, 0); 
+      this.redraw()
+    }
+
+
 
   //   private drawVerticalLine(x: number) {
   //       this.contexts["prev2L"].beginPath();

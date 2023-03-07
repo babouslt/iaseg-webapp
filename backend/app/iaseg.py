@@ -49,6 +49,7 @@ class IASeg:
         self.logger = logger
         self.read_img_fn = read_img_fn
         self.clear()
+        self.state.files = find_files()  # this might change from run to run
 
     def clear(self):
         # initialize

@@ -36,16 +36,17 @@ async def root():  # serve frontend
     return open("frontend/index.html").read()
 
 # # load image
-@app.get("/img")
-def get_img(timestamp: int = None):
+@app.get("/img/{imgNumber}")
+async def get_img(imgNumber: int=None, timestamp: int = None):
     if timestamp is not None:
         logger.info("reset")
         iaseg.clear()
-        img_path = iaseg.reset(0)
+        img_path = iaseg.reset(imgNumber)
+        logger.info("clicks = " + str(iaseg.state.clicks))
         return FileResponse(img_path)
 
 @app.get("/files")
-def get_files():
+async def get_files():
     logger.info("get files")
     # return the list of image paths
     return iaseg.state.files
