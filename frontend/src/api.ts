@@ -1,4 +1,4 @@
-import UPNG from "upng-js";
+// import UPNG from "upng-js";
 import { Viewer } from "./viewer";  // only here for typing
 import { IPaddress, port } from "./main"
 export type ClickType = [number, number, boolean]
@@ -43,20 +43,23 @@ export class API {
   receiveMask(event: MessageEvent) {
     console.log("receiving mask")
     // what is received are the bytes of a .png file
-    const arrayBuffer = event.data;
-    const img = UPNG.decode(arrayBuffer);
-    const rgba8 = new Uint8ClampedArray(UPNG.toRGBA8(img)[0]);
-
-    const maskData = new ImageData(rgba8, Math.floor(this.viewer.imgWidth), Math.floor(this.viewer.imgHeight));
-    console.log(event)
-    // put image in canvas, create new canvas
-    const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
-    maskCanvas.width = Math.floor(this.viewer.imgWidth);
-    maskCanvas.height = Math.floor(this.viewer.imgHeight);
-    const ctx = maskCanvas.getContext("2d")!;
-    ctx.putImageData(maskData, 0, 0);
-    this.viewer.annContext.putImageData(maskData, 0, 0);
-    this.viewer.redraw()
+    const imageData = new Uint8Array(event.data);
+    const blob = new Blob([imageData], {type: "image/png"});
+    const url = URL.createObjectURL(blob);
+    const img = new Image();
+    img.src = url;
+    img.onload = () => {
+      // // put image in canvas, create new canvas
+      const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
+      maskCanvas.width = Math.floor(this.viewer.imgWidth);
+      maskCanvas.height = Math.floor(this.viewer.imgHeight);
+      const ctx = maskCanvas.getContext("2d")!;
+      // ctx.putImageData(maskData, 0, 0);
+      ctx.drawImage(img, 0, 0)
+      // this.viewer.annContext.putImageData(maskData, 0, 0);
+      this.viewer.annContext.drawImage(img, 0, 0);
+      this.viewer.redraw()
+    }
   }
 
 }
