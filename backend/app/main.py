@@ -9,7 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.iaseg import IASeg
-from app.serialization import encode_mask, decode_mask
+from app.serialization import decode_mask
 
 
 # define global variables
@@ -89,10 +89,10 @@ async def handle_mask(websocket: WebSocket):
     connected_websockets["mask"] = websocket
     try:
         while True:
-            packed = await websocket.receive_bytes()
-            logger.info("received mask from frontend")
-            mask = decode_mask(packed, iaseg.mask.shape)
-            iaseg.set_mask(mask)
+            await websocket.receive_bytes()
+            logger.error("received mask from frontend")
+            # mask = decode_mask(packed, iaseg.mask.shape)
+            # iaseg.set_mask(mask)
     except WebSocketDisconnect:
         del connected_websockets["mask"]
         await websocket.close()
