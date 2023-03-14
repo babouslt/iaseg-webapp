@@ -66,6 +66,7 @@ class IASeg:
 
         # IIS
         self.controller = load_controller()
+        self.logger.info(f"device = {self.controller.device}")
         self.controller.set_image(np.array(self.state.pilImg))  # self.controller.predictor.original_image.shape == [1, 3, H, W]
         return img_path
 
