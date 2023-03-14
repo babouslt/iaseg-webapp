@@ -72,14 +72,13 @@ class IASeg:
     @staticmethod
     def load_image_and_mask(img_path):
         imgPath = Path(img_path)
-        maskPath = imgPath.with_stem(imgPath.name + "_mask").with_suffix(".png")
 
         pilImg = Image.open(img_path)
         W, H = pilImg.size
-        mask_path = None
- 
-        if mask_path and mask_path.exists():
-            pilMask = Image.open(mask_path)
+
+        maskPath = imgPath.with_stem(imgPath.name + "_mask").with_suffix(".png")
+        if maskPath and maskPath.exists():
+            pilMask = Image.open(maskPath)
         else:
             pilMask = Image.fromarray(np.zeros((H, W), dtype=bool))
         return pilImg, pilMask, H, W
