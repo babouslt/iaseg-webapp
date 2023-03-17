@@ -34,7 +34,7 @@ class IAsegState:
         self.files = []
 
 
-def find_files(path: str = "/vol/images", allowed_extensions : list[str] =['.jpg', '.jpeg']):
+def find_files(path: str = "/vol/images", allowed_extensions : list[str] =['.jpg', '.jpeg', '.PNG']):
     # finds all files with allowed extensions in a dir recursively
     return sorted([str(file) for file in Path(path).glob('**/*') if file.is_file() and file.suffix in allowed_extensions])
 
@@ -75,6 +75,7 @@ class IASeg:
         imgPath = Path(img_path)
 
         pilImg = Image.open(img_path)
+        pilImg = pilImg.convert("RGB")
         W, H = pilImg.size
 
         maskPath = imgPath.with_stem(imgPath.name + "_mask").with_suffix(".png")
