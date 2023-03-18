@@ -5,10 +5,12 @@ from pathlib import Path
 from PIL import Image
 
 import sys
-# simpleclick_path = '/code/app/external/SimpleClick'
 simpleclick_path = 'app/SimpleClick'
 sys.path.append(simpleclick_path)
-from clean_inference import load_controller
+clickseg_path = 'app/ClickSEG'
+sys.path.append(clickseg_path)
+from clean_inference_SimpleClick import load_controller as  load_controller_sc
+from clean_inference_ClickSEG import load_controller as load_controller_cs
 
 """Notes:
 maskPath is always imgPath + _mask.png
@@ -50,6 +52,7 @@ class IASeg:
         self.read_img_fn = read_img_fn
         self.clear()
         self.state.files = find_files()  # this might change from run to run
+        self.method = 'SimpleClick'
 
     def clear(self):
         # initialize
@@ -65,7 +68,10 @@ class IASeg:
         self.state.pilImg, self.state.pilMask, self.state.H, self.state.W = IASeg.load_image_and_mask(img_path)
 
         # IIS
-        self.controller = load_controller()
+        if self.method == 'SimpleClick':
+            self.controller = load_controller_sc()
+        elif self.method == 'ClickSEG':
+            self.controller = load_controller_cs()
         self.logger.info(f"device = {self.controller.device}")
         self.controller.set_image(np.array(self.state.pilImg))  # self.controller.predictor.original_image.shape == [1, 3, H, W]
         return img_path
