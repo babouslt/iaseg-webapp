@@ -5,7 +5,7 @@ from isegm.inference import utils
 from interactive_demo.controller import InteractiveController
 
 def load_controller():
-    checkpoint_path = utils.find_checkpoint('../weights/simpleclick_models/', 'cocolvis_vit_base.pth')
+    checkpoint_path = utils.find_checkpoint('/code/app/weights/simpleclick_models/', 'cocolvis_vit_base.pth')
 
     torch.backends.cudnn.deterministic = True
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
