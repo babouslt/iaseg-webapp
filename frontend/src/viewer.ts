@@ -213,6 +213,10 @@ export class Viewer {
   //       this.contexts["prev2L"].stroke();
   //   }
 
+  changeTool(tool: string) {
+    this.api.changeTool(tool);
+  }
+
 
 
   // private _clear(): void {  // clears proposals and previews

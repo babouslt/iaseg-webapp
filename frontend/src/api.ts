@@ -44,6 +44,18 @@ export class API {
     )
   }
 
+  changeTool(tool: string) {
+    // hit /tool/{tool} http endpoint and check response is 'tool set'
+    fetch(`http://${IPaddress}:${port}/tool/${tool}`, {method: "POST"}).then(
+      response => {
+        if (response.status == 200) {
+          return response.text();
+        } else {
+          throw new Error("Error changing tool");
+        }
+      })
+  }
+
   // send clicks to backend
   sendClicks(clicks: ClickType[]) {
     this.wsClicks.send(JSON.stringify(clicks));

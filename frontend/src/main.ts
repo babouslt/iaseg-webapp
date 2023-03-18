@@ -1,6 +1,7 @@
 import './style.css';
 import { Viewer } from './viewer';
 import { FileManager } from './fileManager';
+import { checkNull } from './utils';
 
 // // if local/dev
 // export const IPaddress = "localhost"
@@ -20,7 +21,7 @@ const loadImg = () => {
 
 img.addEventListener("load", loadImg);
 
-const fileManager = new FileManager(img);
+const fileManager = new FileManager(img);  // requests an image
 console.log(fileManager)
 
 const clearAnn = () => {
@@ -33,6 +34,16 @@ const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement;
 clearBtn.addEventListener("click", clearAnn);
 
 
+const form = document.querySelector<HTMLFormElement>('#methodForm')!;
+checkNull(form, "methodForm")
 
+form.addEventListener('change', () => {
+  const selectedButton = form.querySelector<HTMLInputElement>('input[type=radio]:checked');
 
-
+  if (selectedButton) {
+    const selectedButtonValue = selectedButton.value;
+    console.log(`Selected button: ${selectedButtonValue}`);
+    viewer.changeTool(selectedButtonValue);
+    clearAnn();
+  }
+});

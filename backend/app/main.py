@@ -46,9 +46,9 @@ async def get_img(imgNumber: int=None, timestamp: int = None):
         logger.info("clicks = " + str(iaseg.state.clicks))
         return FileResponse(img_path)
 
-# load image
+# clear annotation
 @app.post("/img/clear")
-async def get_img():
+async def clear():
     logger.info("reset (clear)")
     iaseg.clear_keeping_img()  # could be made more efficient by clearing the controllers instead of reloading
     img_path = iaseg.reset()
@@ -60,6 +60,11 @@ async def get_files():
     # return the list of image paths
     return iaseg.state.files
 
+@app.post("/tool/{tool}")
+async def set_tool(tool: str):
+    logger.info(f"set tool {tool}")
+    iaseg.change_tool(tool)
+    return 'tool set'
 
 # websocket endpoints
 @app.websocket("/ws/clicks")

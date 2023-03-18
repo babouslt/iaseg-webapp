@@ -9,8 +9,8 @@ simpleclick_path = 'app/SimpleClick'
 sys.path.append(simpleclick_path)
 clickseg_path = 'app/ClickSEG'
 sys.path.append(clickseg_path)
-from clean_inference_SimpleClick import load_controller as  load_controller_sc
-from clean_inference_ClickSEG import load_controller as load_controller_cs
+# from app.SimpleClick.clean_inference_SimpleClick import load_controller as  load_controller_sc
+# from app.ClickSEG.clean_inference_ClickSEG import load_controller as load_controller_cs
 
 """Notes:
 maskPath is always imgPath + _mask.png
@@ -63,7 +63,7 @@ class IASeg:
         self.read_img_fn = read_img_fn
         self.clear()
         self.state.files = find_files()  # this might change from run to run
-        self.method = 'SimpleClick'
+        self.method = 'simpleclick'
 
     def clear(self):
         # initialize
@@ -90,13 +90,18 @@ class IASeg:
             img_path = None
 
         # IIS
-        if self.method == 'SimpleClick':
+        if self.method == 'simpleclick':
             self.controller = load_controller_sc()
-        elif self.method == 'ClickSEG':
+        elif self.method == 'focalclick':
             self.controller = load_controller_cs()
+        else:
+            raise ValueError(f"Unknown method {self.method}")
         self.logger.info(f"device = {self.controller.device}")
         self.controller.set_image(np.array(self.state.pilImg))  # self.controller.predictor.original_image.shape == [1, 3, H, W]
         return img_path
+
+    def change_tool(self, tool):
+        self.method = tool.lower()
 
     @staticmethod
     def load_image_and_mask(img_path):
