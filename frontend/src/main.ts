@@ -11,15 +11,26 @@ export const port = "2332"
 
 const viewer = new Viewer('viewer1', 1);
 const img: HTMLImageElement = new Image();
-img.addEventListener("load", () => {
-    viewer.reset()
-    viewer.handleImage(img)
-  }
-)
+
+// define loadimg callback
+const loadImg = () => {
+  viewer.reset()
+  viewer.handleImage(img)
+}
+
+img.addEventListener("load", loadImg);
 
 const fileManager = new FileManager(img);
 console.log(fileManager)
 
+const clearAnn = () => {
+  viewer.clear();
+  viewer.resetMaskCanvas();
+  viewer.clear();
+}
+
+const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement;
+clearBtn.addEventListener("click", clearAnn);
 
 
 

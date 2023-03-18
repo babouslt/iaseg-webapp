@@ -35,8 +35,19 @@ class IAsegState:
         self.imgNumber : int = imgNumber
         self.files = []
 
+    def reset_keeping_img(self):
+        # image and mask
+        self.pilMask : Image = None
+        # algorithms
+        self.tool : int = 0
+        self.clicks = []  # clicks are (x, y, is_pos) tuples
+        # display
+        self.dx, self.dy, self.zoom = 0, 0, 1
+        # filesystem
+        self.files = []
 
-def find_files(path: str = "/vol/images", allowed_extensions : list[str] =['.jpg', '.jpeg', '.PNG']):
+
+def find_files(path: str = "/vol/images", allowed_extensions : list[str] =['.jpg', '.jpeg', '.PNG', '.png']):
     # finds all files with allowed extensions in a dir recursively
     return sorted([str(file) for file in Path(path).glob('**/*') if file.is_file() and file.suffix in allowed_extensions])
 
@@ -60,12 +71,23 @@ class IASeg:
         if hasattr(self, "controller"):
             del self.controller  # delete controller to free memory
 
-    def reset(self, imgNumber):
+    def clear_keeping_img(self):
+        # initialize
+        self.state.reset_keeping_img()
+        if hasattr(self, "controller"):
+            del self.controller
+
+    def reset(self, imgNumber=None):
         self.state.files = find_files()  # this might change from run to run
         # load image
-        self.state.imgNumber = imgNumber
-        img_path = self.state.files[self.state.imgNumber]
-        self.state.pilImg, self.state.pilMask, self.state.H, self.state.W = IASeg.load_image_and_mask(img_path)
+        if imgNumber is not None:
+            self.state.imgNumber = imgNumber 
+            img_path = self.state.files[self.state.imgNumber]
+            self.state.pilImg, self.state.pilMask, self.state.H, self.state.W = IASeg.load_image_and_mask(img_path)
+        elif self.state.pilImg is not None:  # we had an image but we're resetting, then clear the mask
+            W, H = self.state.pilImg.size
+            self.state.pilMask = Image.fromarray(np.zeros((H, W), dtype=bool))
+            img_path = None
 
         # IIS
         if self.method == 'SimpleClick':

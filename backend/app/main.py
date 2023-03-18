@@ -36,7 +36,7 @@ app.mount("/assets", StaticFiles(directory="frontend/assets"), name="assets")
 async def root():  # serve frontend
     return open("frontend/index.html").read()
 
-# # load image
+# load image
 @app.get("/img/{imgNumber}")
 async def get_img(imgNumber: int=None, timestamp: int = None):
     if timestamp is not None:
@@ -45,6 +45,14 @@ async def get_img(imgNumber: int=None, timestamp: int = None):
         img_path = iaseg.reset(imgNumber)
         logger.info("clicks = " + str(iaseg.state.clicks))
         return FileResponse(img_path)
+
+# load image
+@app.post("/img/clear")
+async def get_img():
+    logger.info("reset (clear)")
+    iaseg.clear_keeping_img()  # could be made more efficient by clearing the controllers instead of reloading
+    img_path = iaseg.reset()
+    return 'cleared'
 
 @app.get("/files")
 async def get_files():

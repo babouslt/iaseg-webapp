@@ -31,6 +31,19 @@ export class API {
   //   this.wsAux = new WebSocket("ws://localhost:8001/ws/aux");
   }
 
+  clear() {
+    // hit /img/clear http endpoint and check response is 'cleared'
+    fetch(`http://${IPaddress}:${port}/img/clear`, {method: "POST"}).then(
+      response => {
+        if (response.status == 200) {
+          return response.text();
+        } else {
+          throw new Error("Error clearing image");
+        }
+      }
+    )
+  }
+
   // send clicks to backend
   sendClicks(clicks: ClickType[]) {
     this.wsClicks.send(JSON.stringify(clicks));

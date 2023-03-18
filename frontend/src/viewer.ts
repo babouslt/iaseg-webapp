@@ -91,8 +91,8 @@ export class Viewer {
       e.stopPropagation();
     });
     }
-
-  reset() {
+  
+  private resetValues() {
     this.zoom = 1;
     this.dx = 0;
     this.dy = 0;
@@ -100,7 +100,19 @@ export class Viewer {
     this.clicks = [];
     this.imgHeight = 0;
     this.imgWidth = 0;
+  }
+
+  reset() {
+    this.resetValues();
     this.clearDataCanvases();
+    this.redraw();
+  }
+
+  clear () {
+    this.api.clear();
+    this.resetValues();
+    this.annContext.clearRect(0, 0, this.annCanvas.width, this.annCanvas.height);
+    this.prev1LContext.clearRect(0, 0, this.prev1LCanvas.width, this.prev1LCanvas.height);
     this.redraw();
   }
   
@@ -169,14 +181,13 @@ export class Viewer {
       console.log('viewer clicks' + this.clicks)
    }
 
-  private resetMaskCanvas() {
+  resetMaskCanvas() {
     const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
     maskCanvas.width = Math.floor(this.imgWidth);
     maskCanvas.height = Math.floor(this.imgHeight);
     const ctx = maskCanvas.getContext("2d")!;
     ctx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
   }
-
 
 
   private putImage(img: HTMLImageElement) {
