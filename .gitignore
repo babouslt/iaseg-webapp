@@ -16,6 +16,7 @@ vol/images/
 frontend/node_modules/
 frontend/dist/
 backend/dist/
+backend/app/weights/
 
 # trash
 frontendts/
