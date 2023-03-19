@@ -1,16 +1,16 @@
-import os
+import importlib
 from math import floor
 import numpy as np
 from pathlib import Path
 from PIL import Image
 
-import sys
-simpleclick_path = 'app/SimpleClick'
-sys.path.append(simpleclick_path)
-clickseg_path = 'app/ClickSEG'
-sys.path.append(clickseg_path)
-# from app.SimpleClick.clean_inference_SimpleClick import load_controller as  load_controller_sc
-# from app.ClickSEG.clean_inference_ClickSEG import load_controller as load_controller_cs
+# import sys
+# simpleclick_path = 'app/SimpleClick'
+# sys.path.append(simpleclick_path)
+# clickseg_path = 'app/ClickSEG'
+# sys.path.append(clickseg_path)
+import app.SimpleClick.clean_inference as inference_sc
+import app.ClickSEG.clean_inference  as inference_cs
 
 """Notes:
 maskPath is always imgPath + _mask.png
@@ -91,9 +91,11 @@ class IASeg:
 
         # IIS
         if self.method == 'simpleclick':
-            self.controller = load_controller_sc()
+            importlib.reload(inference_sc)
+            self.controller = inference_sc.load_controller(self.logger)
         elif self.method == 'focalclick':
-            self.controller = load_controller_cs()
+            importlib.reload(inference_cs)
+            self.controller = inference_cs.load_controller(self.logger)
         else:
             raise ValueError(f"Unknown method {self.method}")
         self.logger.info(f"device = {self.controller.device}")

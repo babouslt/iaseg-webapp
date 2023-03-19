@@ -27,7 +27,6 @@ console.log(fileManager)
 const clearAnn = () => {
   viewer.clear();
   viewer.resetMaskCanvas();
-  viewer.clear();
 }
 
 const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement;
