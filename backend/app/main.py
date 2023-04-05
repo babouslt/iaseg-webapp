@@ -9,7 +9,6 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.iaseg import IASeg
-from app.serialization import decode_mask
 
 
 # define global variables
