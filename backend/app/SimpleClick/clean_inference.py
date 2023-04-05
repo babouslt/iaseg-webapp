@@ -77,9 +77,11 @@ def my_load(zip_file, map_location, pickle_module, pickle_file='data.pkl', **pic
 
 torch.serialization._load = my_load
 
-def load_controller(logger):
-    logger.info('Loading simpleclick controller...')
-    checkpoint_path = utils.find_checkpoint('/code/app/weights/simpleclick_models/', 'cocolvis_vit_base.pth')
+def load_controller(logger=None):
+    if logger:
+        logger.info('Loading simpleclick controller...')
+    # checkpoint_path = utils.find_checkpoint('/code/app/weights/simpleclick_models/', 'cocolvis_vit_base.pth')
+    checkpoint_path = utils.find_checkpoint('app/weights/simpleclick_models/', 'cocolvis_vit_base.pth')
 
     torch.backends.cudnn.deterministic = True
     device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
@@ -89,8 +91,8 @@ def load_controller(logger):
                                                 update_image_callback=None)
     def update_image_callback(reset_canvas=True):
       img = controller.get_visualization(0.5, 5)
-      Image.fromarray(img).save('/vol/out.png')  # when in container
-      # Image.fromarray(img).save('../results/out.png')
+    #   Image.fromarray(img).save('/vol/out.png')  # when in container
+      Image.fromarray(img).save('out.png')
 
     controller.update_image_callback = update_image_callback
     return controller

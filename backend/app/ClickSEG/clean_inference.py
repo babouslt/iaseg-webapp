@@ -77,8 +77,9 @@ def my_load(zip_file, map_location, pickle_module, pickle_file='data.pkl', **pic
 
 torch.serialization._load = my_load
 
-def load_controller(logger):
-    logger.info('Loading focalclick controller...')
+def load_controller(logger=None):
+    if logger:
+        logger.info('Loading focalclick controller...')
     checkpoint_path = utils.find_checkpoint('/code/app/weights/focalclick_models/', 'combined_segformerb3s2.pth')
 
     torch.backends.cudnn.deterministic = True
