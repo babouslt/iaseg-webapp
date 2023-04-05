@@ -39,31 +39,26 @@ async def root():  # serve frontend
 @app.get("/img/{imgNumber}")
 async def get_img(imgNumber: int=None, timestamp: int = None):
     if timestamp is not None:
-        logger.info("reset")
-        iaseg.clear()
-        img_path = iaseg.reset(imgNumber)
-        logger.info("clicks = " + str(iaseg.state.clicks))
+        logger.info("get img")
+        img_path = iaseg.api_get_img(imgNumber)
         return FileResponse(img_path)
 
 # clear annotation
 @app.post("/img/clear")
 async def clear():
-    logger.info("reset (clear)")
-    iaseg.clear_keeping_img()  # could be made more efficient by clearing the controllers instead of reloading
-    img_path = iaseg.reset()
-    return 'cleared'
+    logger.info("clear")
+    return iaseg.api_clear()
 
 @app.get("/files")
 async def get_files():
     logger.info("get files")
-    # return the list of image paths
-    return iaseg.state.files
+    return iaseg.api_get_files()
+
 
 @app.post("/tool/{tool}")
 async def set_tool(tool: str):
     logger.info(f"set tool {tool}")
-    iaseg.change_tool(tool)
-    return 'tool set'
+    return iaseg.api_set_tool(tool)
 
 # websocket endpoints
 @app.websocket("/ws/clicks")
@@ -74,8 +69,8 @@ async def receive_clicks(websocket: WebSocket):
         while True:
             clicks = await websocket.receive_json()
             logger.info(f"clicks = {clicks}")
-            iaseg.set_clicks_and_infer(clicks)
-            await mask_to_frontend(iaseg.state.pilMask)
+            pilMask = iaseg.api_receive_clicks(clicks)
+            await mask_to_frontend(pilMask)
     except WebSocketDisconnect:
         del connected_websockets["clicks"]
         await websocket.close()
@@ -111,8 +106,8 @@ async def handle_mask(websocket: WebSocket):
 
 
 async def mask_to_frontend(pilMask):
-    logger.info("mask_to_frontend")
-    logger.info(connected_websockets)
+    # logger.info("mask_to_frontend")
+    # logger.info(connected_websockets)
     if "mask" in connected_websockets:
         buffer = io.BytesIO()
         pilMask.save(buffer, format="PNG")
