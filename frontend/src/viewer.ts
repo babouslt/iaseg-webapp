@@ -23,6 +23,7 @@ export class Viewer {
   private dy: number = 0;
   private alpha: number = 0.5;
   private clicks: ClickType[] = [];
+  private tool: string;
   imgWidth: number = 0;
   imgHeight: number = 0;
 
@@ -35,6 +36,7 @@ export class Viewer {
     this.canvasHeight = this.canvasFactor * 224;
     this.canvasWidth = this.canvasFactor * 224;
     this.api = new API(this)
+    this.tool = "focalclick"  // default tool
 
 
 
@@ -214,6 +216,7 @@ export class Viewer {
   //   }
 
   changeTool(tool: string) {
+    this.tool = tool
     this.api.changeTool(tool);
   }
 
@@ -340,14 +343,19 @@ export class Viewer {
     //   // this.clicks.push([e.offsetX, e.offsetY, false]);
     //   console.log("woohoo")
     // }
-    const [cx, cy] = this.imgAbsCoords(e)
-    const is_pos = e.button == 0
-    const click : ClickType = [Math.floor(cx), Math.floor(cy), is_pos]
-    this.clicks.push(click);
-    this.api.sendClicks(this.clicks)
-    console.log(this.clicks)
-    console.log("you should have received the clicks")
-    this.drawClicks()
+    if (this.tool == "focalclick") {
+      const [cx, cy] = this.imgAbsCoords(e)
+      const is_pos = e.button == 0
+      const click : ClickType = [Math.floor(cx), Math.floor(cy), is_pos]
+      this.clicks.push(click);
+      this.api.sendClicks(this.clicks)
+      console.log(this.clicks)
+      console.log("you should have received the clicks")
+      this.drawClicks()
+    }
+    else if (this.tool == "dummy") {
+      console.log("You made a dummy click")
+    }
 
     // else if ((e.button === 0) || ((e.button === 2) && (2 < this.model.tool))) {  // left click
     //   // this.tools[this.model.tool].mouseDown(e, this);
