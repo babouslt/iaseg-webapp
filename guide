@@ -1,0 +1,7 @@
+
+Hi, this is the technical interview. I'll ask you to implement one more feature in the current repository. Now I'll show you how to set it up.
+
+We will use the local branch. This contains a few things: backend code, frontend code, and docker code. We use docker to ensure reproducibility and ease deployment. If you don't have docker installed, go and install it, it's useful!
+
+I use vscode, feel free to use the editor you like. The code on `try_dev.sh` is how we build the project and launch it locally. The main issue is that we are lacking some components: artificial neural network weights and some images. Follow the instructions on the readme to download the weights.
+
