@@ -4,12 +4,7 @@ import numpy as np
 from pathlib import Path
 from PIL import Image
 
-# import sys
-# simpleclick_path = 'app/SimpleClick'
-# sys.path.append(simpleclick_path)
-# clickseg_path = 'app/ClickSEG'
-# sys.path.append(clickseg_path)
-import app.SimpleClick.clean_inference as inference_sc
+
 import app.ClickSEG.clean_inference  as inference_cs
 
 """Notes:
@@ -63,7 +58,7 @@ class IASeg:
         self.read_img_fn = read_img_fn
         self.clear()
         self.state.files = find_files()  # this might change from run to run
-        self.method = 'simpleclick'
+        self.method = 'focalclick'
 
     def clear(self):
         # initialize
@@ -90,10 +85,7 @@ class IASeg:
             img_path = None
 
         # IIS
-        if self.method == 'simpleclick':
-            importlib.reload(inference_sc)
-            self.controller = inference_sc.load_controller(self.logger)
-        elif self.method == 'focalclick':
+        if self.method == 'focalclick':
             importlib.reload(inference_cs)
             self.controller = inference_cs.load_controller(self.logger)
         else:
@@ -126,29 +118,3 @@ class IASeg:
         x, y, is_pos = clicks[-1]
         self.controller.add_click(x, y, is_pos)  # this call launches prediction
         self.state.pilMask = Image.fromarray(np.array(0 < self.controller.result_mask))  # the same as proposal
-
-    # def crop_mask(self, mask):
-    #     self.logger.info('sizes')
-    #     self.logger.info(mask.size)
-    #     mask_crop = mask.crop(
-    #       (
-    #         min(0, floor(-self.dy / self.zoom)),
-    #         min(0, floor(-self.dx / self.zoom)),
-    #         max(self.H, floor((self.H - self.dy) / self.zoom)),
-    #         max(self.W, floor((self.W - self.dx) / self.zoom)),
-    #       )
-    #     )
-    #     self.logger.info(mask_crop.size)
-    #     return mask_crop
-
-    # def dummy_predict(self):
-    #     # dummy prediction, just add some mask around the click position
-    #     mask = np.array(self.mask)
-    #     for xa, ya, is_pos in self.clicks:
-    #         x, y = ya, xa
-    #         mask[x - 10 : x + 10, y - 10 : y + 10] = is_pos
-    #     self.mask = Image.fromarray(mask)
-    #     self.mask.save("/code/vol/mask.png")
-    #     self.crop_mask(self.mask).save("/code/vol/mask_crop.png")
-    #     return self.mask
-
