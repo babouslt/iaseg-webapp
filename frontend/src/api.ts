@@ -87,4 +87,14 @@ export class API {
     }
   }
 
+  sendMask() {
+    // send the mask to the backend
+    const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
+    const maskData = maskCanvas.getContext("2d")!.getImageData(0, 0, maskCanvas.width, maskCanvas.height);
+    // send as png file NOT using UPNG
+    const png = new Blob([maskData.data], {type: "image/png"});
+    this.wsMask.send(png);
+    // COMPLETE and test it :)
+  }
+
 }
