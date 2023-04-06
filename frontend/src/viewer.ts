@@ -113,13 +113,15 @@ export class Viewer {
   clear () {
     this.api.clear();
     this.resetValues();
+    this.imgWidth = this.imgCanvas.width;
+    this.imgHeight = this.imgCanvas.height;
     this.annContext.clearRect(0, 0, this.annCanvas.width, this.annCanvas.height);
     this.prev1LContext.clearRect(0, 0, this.prev1LCanvas.width, this.prev1LCanvas.height);
     this.redraw();
   }
   
 
-    
+
 
   redraw(): void {
     // at some point should consider: https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Optimizing_canvas
