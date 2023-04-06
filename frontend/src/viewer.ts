@@ -345,10 +345,10 @@ export class Viewer {
     //   // this.clicks.push([e.offsetX, e.offsetY, false]);
     //   console.log("woohoo")
     // }
+    const [cx, cy] = this.imgAbsCoords(e)
+    const is_pos = e.button == 0
+    const click : ClickType = [Math.floor(cx), Math.floor(cy), is_pos]
     if (this.tool == "focalclick") {
-      const [cx, cy] = this.imgAbsCoords(e)
-      const is_pos = e.button == 0
-      const click : ClickType = [Math.floor(cx), Math.floor(cy), is_pos]
       this.clicks.push(click);
       this.api.sendClicks(this.clicks)
       console.log(this.clicks)
@@ -357,6 +357,12 @@ export class Viewer {
     }
     else if (this.tool == "dummy") {
       console.log("You made a dummy click")
+      // create a rectangle on the mask around the click
+      this.annContext.fillRect(click[0] - 5, click[1] - 5, 10, 10);
+      const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
+      const ctx = maskCanvas.getContext("2d")!;
+      ctx.fillRect(click[0] - 50, click[1] - 50, 100, 100);
+      this.redraw()
     }
 
     // else if ((e.button === 0) || ((e.button === 2) && (2 < this.model.tool))) {  // left click
