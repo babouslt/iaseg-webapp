@@ -358,10 +358,11 @@ export class Viewer {
     else if (this.tool == "dummy") {
       console.log("You made a dummy click")
       // create a rectangle on the mask around the click
+      console.log(this.annContext)
       this.annContext.fillRect(click[0] - 5, click[1] - 5, 10, 10);
       const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
       const ctx = maskCanvas.getContext("2d")!;
-      ctx.fillRect(click[0] - 50, click[1] - 50, 100, 100);
+      ctx.fillRect(click[0] - 5, click[1] - 5, 10, 10);
       this.redraw()
     }
 

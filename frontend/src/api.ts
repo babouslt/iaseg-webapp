@@ -2,7 +2,7 @@
 import { Viewer } from "./viewer";  // only here for typing
 import { IPaddress, port } from "./main"
 export type ClickType = [number, number, boolean]
-
+import html2canvas from 'html2canvas'
 
 
 export class API {
@@ -94,7 +94,17 @@ export class API {
     // send as png file NOT using UPNG
     const png = new Blob([maskData.data], {type: "image/png"});
     this.wsMask.send(png);
+
     // COMPLETE and test it :)
+    //Download the mask as a png
+    html2canvas(maskCanvas).then((canvas) => {
+      const imgDataUrl = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = imgDataUrl;
+      link.download = 'image.png';
+      link.click();
+    })
+
   }
 
 }
