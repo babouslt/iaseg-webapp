@@ -373,6 +373,24 @@ export class Viewer {
 
   }
 
+  //function to be called when you click on the mask
+  private erase = (e: MouseEvent): void => {
+    const [cx, cy] = this.imgAbsCoords(e)
+    const is_pos = e.button == 0
+    const click : ClickType = [Math.floor(cx), Math.floor(cy), is_pos]
+    //detect if the click is already selected
+    const index = this.clicks.indexOf(click)
+    if (index !== -1) {
+      this.clicks.splice(index,1)
+      console.log("click deleted")
+      const maskCanvas = document.getElementById("maskCanvas") as HTMLCanvasElement;
+      const ctx = maskCanvas.getContext("2d")!;
+      ctx.fillRect(click[0] - 5, click[1] - 5, 10, 10); //dont know how to put it in white
+    } 
+    else {
+      console.log("click is not already selected")
+    }
+  }
 
   // private _mouseMove = (e: MouseEvent): void => {
   //   if (this.panning) 3
